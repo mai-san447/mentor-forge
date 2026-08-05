@@ -16,8 +16,8 @@
 | 項目 | 値 |
 | --- | --- |
 | 本番PHP | **8.3 が上限**（`/usr/local/php/` は 5.2〜8.3 のみ。`php` は 8.3.32） |
-| 本番シェル | FreeBSD の **csh**（`export` は使えない。`setenv` を使う） |
-| 接続 | `ssh <user>@<host>`（パスワード＝**サーバパスワード**。会員パスワードではない） |
+| 本番シェル | FreeBSD の **csh**。`export` は使えない（`setenv`）。**`for` ループも使えない**ので `find … \| xargs …` で代用する |
+| 接続 | **公開鍵認証を登録済み。`ssh sakura` だけで繋がる**（`~/.ssh/config` にホスト名とユーザー名を記載）。パスワード入力は不要 |
 | アプリ本体 | `~/www/mentor-forge/`（公開領域 `www` の中にアプリ全体がある） |
 | 同居プロジェクト | `~/www` には `ouen_plz` `reading_log` などが同居。**一括の `mv`／`rm` は絶対にしない** |
 | ローカル | WSL Ubuntu `~/mentor-forge`。ホストのPHPも 8.3 系、composer あり |
@@ -174,8 +174,16 @@ tail -50 ~/www/mentor-forge/storage/logs/laravel.log
 
 ## 5. 既知の負債（直したら消す）
 
-- **アプリ本体が公開領域 `www` の中にある。** 本来は `public/` だけを公開領域に置く構成が正しい。
-  現状はリポジトリ直下の `.htaccess` で `app` `config` `storage` `vendor` 等と `.env` 等の機密ファイルを遮断して凌いでいる。
-  この `.htaccess` はリポジトリで管理している（サーバ上だけに置くと、再デプロイで消えて `.env` が丸見えになるため）。
-- **SSH がパスワード認証のみ。** 公開鍵を登録すれば `scp`／`ssh` を自動化でき、手順を1コマンドにまとめられる。
-- `routes/web.php.orig` がコミットされている（マージの残骸）。使っていないなら消す。
+- **アプリ本体が公開領域 `www` の中にある。** これが根本原因。本来は `public/` だけを公開領域に置く構成が正しく、
+  さくらのコントロールパネルでサブドメインを作り公開フォルダに `www/mentor-forge/public` を指定すれば解消する。
+  そうすれば URL から `/public/` も消える。
+
+  それまでの遮断策として、**`.htaccess` を9枚**置いている（リポジトリ管理）。
+  ルートに1枚（`Options -Indexes` ＋ ドットファイル・`composer.*`・`artisan` を拒否）と、
+  `app` `bootstrap` `config` `database` `resources` `routes` `storage` `vendor` の各直下に
+  `Require all denied` を1枚ずつ。mod_rewrite に依存しないので、サブディレクトリが独自の
+  RewriteRule を持っていても効く。**この方式は本番の Apache で 403 を実測確認している。**
+
+  `vendor/` は `.gitignore` 対象で composer が作り直すため、`scripts/build-deploy-archive.sh` が
+  アーカイブ作成時に `app/.htaccess` から複製し、9枚そろっていなければアーカイブを不良品として止める。
+  1枚でも欠けると `.env` や `vendor` が URL で読めるようになるため、ここは検査で担保している。

@@ -57,6 +57,11 @@ restore_dev_deps() {
 }
 trap restore_dev_deps EXIT
 
+# vendor/ は .gitignore 対象で composer が作り直すため、遮断用の .htaccess が消える。
+# アプリ本体が公開領域の中にある以上ここが空くと vendor が丸ごと読めるので、毎回置き直す。
+# 中身はリポジトリ管理下の app/.htaccess と同一（本番で403が出ることを実機確認済みの版）。
+cp app/.htaccess vendor/.htaccess
+
 echo "==> アーカイブ作成: ${OUT}"
 rm -f "$OUT"
 tar -czf "$OUT" -C "$PARENT_DIR" \
@@ -94,10 +99,18 @@ check_absent "^${REPO_NAME}/\.env$"                            ".env（本番の
 check_absent "^${REPO_NAME}/node_modules/"                     "node_modules"
 
 for required in "${REPO_NAME}/public/index.php" "${REPO_NAME}/vendor/autoload.php" \
-                "${REPO_NAME}/public/build/manifest.json" "${REPO_NAME}/.htaccess"; do
+                "${REPO_NAME}/public/build/manifest.json"; do
   grep -qxF "$required" <<< "$LIST" || die "${required} がアーカイブに無い。"
   ok "${required} を含む"
 done
+
+# 遮断用 .htaccess の欠落は、気づかないまま .env や vendor が公開される事故に直結する。
+# 1枚でも欠けたらアーカイブを不良品として扱う。
+for guarded in "" "/app" "/bootstrap" "/config" "/database" "/resources" "/routes" "/storage" "/vendor"; do
+  grep -qxF "${REPO_NAME}${guarded}/.htaccess" <<< "$LIST" \
+    || die "${REPO_NAME}${guarded}/.htaccess がアーカイブに無い。公開領域が空く。"
+done
+ok "遮断用 .htaccess 9枚をすべて含む"
 
 echo
 echo "完了: ${OUT} ($(du -h "$OUT" | cut -f1))"
