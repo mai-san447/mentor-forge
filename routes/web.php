@@ -37,8 +37,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('trio/{session}', [TrioPracticeController::class, 'show'])->name('trio.show');
     Route::post('trio/{session}/feedback', [TrioPracticeController::class, 'feedback'])->name('trio.feedback');
 
+    // 1問ずつ出して、答えた直後に解説を見せる。進行状況はセッションに持つ。
     Route::get('quiz', [QuizController::class, 'index'])->name('quiz.index');
-    Route::post('quiz', [QuizController::class, 'submit'])->name('quiz.submit');
+    Route::post('quiz/answer', [QuizController::class, 'answer'])->name('quiz.answer');
+    Route::post('quiz/next', [QuizController::class, 'next'])->name('quiz.next');
+    Route::post('quiz/restart', [QuizController::class, 'restart'])->name('quiz.restart');
     Route::get('quiz/result/{attempt}', [QuizController::class, 'result'])->name('quiz.result');
 });
 
