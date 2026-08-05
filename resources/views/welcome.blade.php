@@ -1,138 +1,163 @@
-{{--
-    未ログインで最初に見られるページ。ダッシュボードと同じ配色・語彙にそろえている。
-    スタイルをこのファイルに内包しているのは、Vite のビルド成果物に依存させないため
-    （このページだけ CSS のリビルド漏れで崩れる事故を避ける）。Laravel 標準の welcome も同じ作り。
---}}
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mentor Forge — 学んで、試して、実践する</title>
-    <meta name="description" content="メンタリングの知識をクイズで学び、ソロ練習とトリオ練習で身につける学習アプリ。">
+@extends('layouts.public')
 
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+@section('title', 'Mentor Forge — 学んで、試して、実践する')
 
-    <style>
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans",
-                         "Noto Sans JP", Meiryo, sans-serif;
-            color: #18181b;
-            background: #fafafa;
-            line-height: 1.7;
-            -webkit-font-smoothing: antialiased;
-        }
-        a { text-decoration: none; color: inherit; }
-        .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
-
-        header { border-bottom: 1px solid #e4e4e7; background: #fff; }
-        .head-inner { display: flex; align-items: center; justify-content: space-between;
-                      gap: 16px; padding: 18px 0; flex-wrap: wrap; }
-        .brand { font-size: 13px; font-weight: 700; letter-spacing: 0.2em; color: #0d9488; }
-        .nav { display: flex; gap: 12px; align-items: center; }
-
-        .btn { display: inline-block; padding: 10px 20px; border-radius: 9999px;
-               font-size: 15px; font-weight: 700; transition: background .15s, color .15s; }
-        .btn-primary { background: #0f766e; color: #fff; }
-        .btn-primary:hover { background: #115e59; }
-        .btn-ghost { color: #0f766e; border: 1px solid #99f6e4; background: #fff; }
-        .btn-ghost:hover { background: #f0fdfa; }
-
-        .hero { padding: 72px 0 56px; }
-        .hero h1 { margin: 12px 0 0; font-size: clamp(28px, 5vw, 44px);
-                   font-weight: 800; letter-spacing: -0.01em; line-height: 1.35; }
-        .hero p { margin: 16px 0 0; max-width: 40em; font-size: 17px; color: #52525b; }
-        .hero .cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; }
-
-        .cards { display: grid; gap: 20px; grid-template-columns: 1fr; padding-bottom: 56px; }
-        @media (min-width: 760px) { .cards { grid-template-columns: repeat(3, 1fr); } }
-        .card { border-radius: 16px; padding: 24px; color: #fff;
-                box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-        .card .icon { font-size: 30px; line-height: 1; }
-        .card h2 { margin: 18px 0 0; font-size: 20px; font-weight: 700; }
-        .card p { margin: 8px 0 0; font-size: 14px; }
-        .c-solo { background: #0f766e; }
-        .c-solo p { color: #f0fdfa; }
-        .c-trio { background: #4338ca; }
-        .c-trio p { color: #eef2ff; }
-        .c-quiz { background: #f59e0b; }
-        .c-quiz p { color: #fffbeb; }
-
-        .note { border: 1px solid #e4e4e7; background: #fff; border-radius: 16px;
-                padding: 24px; margin-bottom: 64px; }
-        .note h3 { margin: 0; font-size: 16px; font-weight: 700; }
-        .note p { margin: 8px 0 0; font-size: 15px; color: #52525b; }
-
-        footer { border-top: 1px solid #e4e4e7; background: #fff;
-                 padding: 24px 0; font-size: 13px; color: #71717a; }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="wrap head-inner">
-            <span class="brand">MENTOR FORGE</span>
-            <nav class="nav">
-                @auth
-                    <a class="btn btn-primary" href="{{ route('dashboard') }}">ダッシュボードへ</a>
-                @else
-                    <a class="btn btn-ghost" href="{{ route('login') }}">ログイン</a>
-                    <a class="btn btn-primary" href="{{ route('register') }}">新規登録</a>
-                @endauth
-            </nav>
+@section('content')
+    <section class="hero">
+        <p class="eyebrow">MENTOR FORGE</p>
+        <h1>学んで、試して、実践する</h1>
+        <p class="lead">
+            メンタリング（1on1）のスキルを、知識を入れて終わりにせず、
+            対話を実際にやってみるところまで一続きで練習できる学習アプリです。
+        </p>
+        <div class="cta">
+            @auth
+                <a class="btn btn-primary" href="{{ route('dashboard') }}">ダッシュボードへ</a>
+            @else
+                <a class="btn btn-primary" href="{{ route('register') }}">新規登録して始める</a>
+                <a class="btn btn-ghost" href="{{ route('login') }}">ログイン</a>
+            @endauth
         </div>
-    </header>
+    </section>
 
-    <main class="wrap">
-        <section class="hero">
-            <h1>学んで、試して、実践する</h1>
-            <p>
-                メンタリングの知識をクイズで学び、ソロ練習とトリオ練習で身につけるための学習アプリです。
-                知識を入れて終わりにせず、対話を実際にやってみるところまでを一つの流れにしています。
-            </p>
-            <div class="cta">
-                @auth
-                    <a class="btn btn-primary" href="{{ route('dashboard') }}">ダッシュボードへ</a>
-                @else
-                    <a class="btn btn-primary" href="{{ route('register') }}">新規登録して始める</a>
-                    <a class="btn btn-ghost" href="{{ route('login') }}">ログイン</a>
-                @endauth
-            </div>
-        </section>
+    <section>
+        <h2>Mentor Forge とは</h2>
+        <p>
+            後輩や部下との1on1を任されたものの、何をどう聞けばいいのか分からない。
+            本を読んで頭では分かっても、いざ相手を前にすると言葉が出てこない。
+            Mentor Forge は、その「分かる」と「できる」の間を埋めるために作りました。
+        </p>
+        <p>
+            傾聴・質問・共感の基本をクイズで確認したあと、相談者役を相手に一人で対話を練習できます。
+            さらに実際の3人で役割を交代しながら練習し、お互いにフィードバックを残せます。
+            <strong>何度でも失敗できる場所</strong>で先に失敗しておくのが、このアプリの役割です。
+        </p>
+    </section>
 
-        <section class="cards">
+    <section>
+        <h2>3つの練習</h2>
+        <div class="cards">
             <div class="card c-solo">
                 <span class="icon">🎧</span>
-                <h2>ソロ練習</h2>
-                <p>AIペルソナと一人で対話を練習します。</p>
+                <h3>ソロ練習</h3>
+                <p>相談者役と1対1でテキスト対話。終了すると対話の内容からスコアが出ます。</p>
             </div>
             <div class="card c-trio">
                 <span class="icon">👥</span>
-                <h2>トリオ練習</h2>
-                <p>3人で役割を交代しながら実践します。</p>
+                <h3>トリオ練習</h3>
+                <p>メンター・メンティ・観察者の3役で実践。終わったら相互にフィードバックを記録します。</p>
             </div>
             <div class="card c-quiz">
                 <span class="icon">🧠</span>
-                <h2>クイズ</h2>
-                <p>傾聴や質問の基礎を確認します。</p>
+                <h3>クイズ</h3>
+                <p>傾聴・質問・共感の基本を4択で確認。1問ごとに解説が出ます。</p>
             </div>
-        </section>
+        </div>
+    </section>
 
-        @guest
-            <section class="note">
-                <h3>はじめての方へ</h3>
-                <p>
-                    新規登録するとすぐに全機能をお試しいただけます。確認メールの受信は不要です。
-                </p>
-            </section>
-        @endguest
-    </main>
+    <section>
+        <h2>使い方</h2>
+        <div class="steps">
+            <div class="step">
+                <span class="num">1</span>
+                <h3>登録する</h3>
+                <p>メールアドレスとパスワードだけで登録できます。確認メールを待つ必要はありません。</p>
+            </div>
+            <div class="step">
+                <span class="num">2</span>
+                <h3>クイズで学ぶ</h3>
+                <p>まずクイズで基本を確認します。数分で終わります。間違えた問題には解説が出ます。</p>
+            </div>
+            <div class="step">
+                <span class="num">3</span>
+                <h3>練習する</h3>
+                <p>一人ならソロ練習へ。3人そろうならトリオ練習でルームを作り、コードを共有します。</p>
+            </div>
+        </div>
+    </section>
 
-    <footer>
-        <div class="wrap">Mentor Forge</div>
-    </footer>
-</body>
-</html>
+    <section>
+        <h2>動作環境</h2>
+        <div class="box">
+            <dl>
+                <dt>対応端末</dt>
+                <dd>パソコン・スマートフォン・タブレット。画面幅に合わせて表示が変わります。</dd>
+                <dt>対応ブラウザ</dt>
+                <dd>Google Chrome / Microsoft Edge / Safari / Firefox の最新版。</dd>
+                <dt>必要なもの</dt>
+                <dd>インターネット接続とメールアドレスのみ。アプリのインストールは不要です。</dd>
+                <dt>トリオ練習</dt>
+                <dd>3人それぞれの端末が必要です。同じルームコードを共有して参加します。</dd>
+            </dl>
+        </div>
+    </section>
+
+    <section>
+        <h2>ご利用にあたって</h2>
+        <div class="box warn">
+            <ul>
+                <li><strong>本サービスは練習を目的とした学習用アプリです。</strong>実際の相談や支援を受け付けるものではありません。</li>
+                <li>練習相手として登場する相談者は<strong>実在の人物ではありません</strong>。あらかじめ用意した応答パターンに沿って返答します。</li>
+                <li>心身の不調や深刻な悩みについては、医療機関や公的な相談窓口にご相談ください。</li>
+                <li>学習課題として制作したものです。内容の正確性や、継続してご利用いただけることを保証するものではありません。</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>よくあるご質問</h2>
+
+        <details>
+            <summary>費用はかかりますか？</summary>
+            <p>かかりません。学習課題として公開しているもので、料金の請求や決済の仕組みはありません。</p>
+        </details>
+
+        <details>
+            <summary>スマートフォンでも使えますか？</summary>
+            <p>使えます。ブラウザからそのままご利用いただけます。アプリのインストールは不要です。</p>
+        </details>
+
+        <details>
+            <summary>相談者役は本物の人間ですか？</summary>
+            <p>いいえ。あらかじめ用意した応答パターンに沿って返答しています。こちらの言葉づかいによって返し方が変わるようにしてあり、指示的な言い方をすると相手が話しづらくなる、という反応も含まれています。</p>
+        </details>
+
+        <details>
+            <summary>一人でも使えますか？</summary>
+            <p>使えます。クイズとソロ練習は一人で完結します。トリオ練習だけは3人必要です。</p>
+        </details>
+
+        <details>
+            <summary>トリオ練習には何人必要ですか？</summary>
+            <p>3人です。メンター役・メンティ役・観察者役に分かれ、ルームを作った人がルームコードを他の2人に伝えます。</p>
+        </details>
+
+        <details>
+            <summary>練習の内容は他の人に見えますか？</summary>
+            <p>ソロ練習とクイズの結果はご本人だけが見られます。トリオ練習は3人で共有する仕組みのため、同じルームに参加した方に対話内容とフィードバックが表示されます。</p>
+        </details>
+
+        <details>
+            <summary>アカウントを削除したいのですが</summary>
+            <p>ログイン後、設定画面のプロフィールからご自身で削除できます。削除すると練習の記録も一緒に消えます。</p>
+        </details>
+
+        <details>
+            <summary>うまく動かないときは</summary>
+            <p><a href="{{ route('contact.create') }}">お問い合わせフォーム</a>からご連絡ください。お使いの端末とブラウザを書き添えていただけると助かります。</p>
+        </details>
+    </section>
+
+    <section>
+        <h2>はじめてみる</h2>
+        <p>登録は1分ほどで終わります。確認メールを待つ必要はありません。</p>
+        <div class="cta">
+            @auth
+                <a class="btn btn-primary" href="{{ route('dashboard') }}">ダッシュボードへ</a>
+            @else
+                <a class="btn btn-primary" href="{{ route('register') }}">新規登録して始める</a>
+                <a class="btn btn-ghost" href="{{ route('about') }}">このサイトについて</a>
+            @endauth
+        </div>
+    </section>
+@endsection
