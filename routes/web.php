@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\SoloPracticeController;
@@ -7,6 +8,18 @@ use App\Http\Controllers\TrioPracticeController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::view('about', 'about')->name('about');
+
+// 未登録の人からも問い合わせを受けられるよう、認証を要求しない。
+Route::get('contact', [ContactController::class, 'create'])->name('contact.create');
+Route::post('contact', [ContactController::class, 'store'])
+    ->middleware('throttle:3,10')
+    ->name('contact.store');
+
+// 受信箱は管理用。誰が開けるかは ContactController 側で判定する。
+Route::get('contact/inbox', [ContactController::class, 'inbox'])
+    ->middleware('auth')
+    ->name('contact.inbox');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
