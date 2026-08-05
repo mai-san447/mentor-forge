@@ -1,0 +1,26 @@
+# アプリ本体が公開領域（さくらの ~/www）の中にあるため、public/ 以外への
+# 直接アクセスをここで遮断する。本来は public/ だけを公開領域に置く構成が正しい。
+#
+# このファイルをリポジトリで管理しているのは、サーバ上にだけ置くと再デプロイで
+# 消えて .env が URL から丸見えになるため。DocumentRoot を public/ に変更できたら
+# このファイルごと不要になる。
+
+Options -Indexes
+
+# アプリの内部ディレクトリは丸ごと拒否する。
+# public/ は自身の .htaccess で RewriteEngine を持つため、ここのルールは継承されない。
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(app|bootstrap|config|database|node_modules|resources|routes|scripts|storage|tests|vendor|docs)(/|$) - [F,L]
+</IfModule>
+
+# ドットファイル（.env / .git 等）と、直下の設定・メタファイル。
+<FilesMatch "(^\.|^(artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|phpstan\.neon|pint\.json|vite\.config\.js|compose\.yaml)$|\.(orig|bak|sql|sqlite|log|md)$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
