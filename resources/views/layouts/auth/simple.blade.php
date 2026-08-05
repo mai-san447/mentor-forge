@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+{{-- 公開ページもアプリ画面も明色なので、ログイン画面だけ暗くならないよう dark を外す。
+     スターターキットの既定は class="dark" の直書きだった。 --}}
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
