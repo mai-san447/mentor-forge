@@ -20,6 +20,19 @@ function makeQuestions(int $count = 3): void
     }
 }
 
+/**
+ * 回答を送る。値はすべて文字列にする。
+ * ブラウザのフォームから届くのは文字列であり、ここを整数で渡すと
+ * 型の食い違いによる不具合をテストが見逃す（実際に見逃した）。
+ */
+function answer(QuizQuestion $question, int $choice)
+{
+    return test()->post(route('quiz.answer'), [
+        'question_id' => (string) $question->id,
+        'choice' => (string) $choice,
+    ]);
+}
+
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user);
@@ -35,34 +48,32 @@ it('1問目だけを出し、回答するまで解説を見せない', function 
         ->assertDontSee('かいせつ1');
 });
 
-it('回答すると正誤と解説が出る', function () {
+it('正解を選ぶと正解と表示され、解説が出る', function () {
     makeQuestions();
-    $question = QuizQuestion::first();
 
-    $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => 1])
-        ->assertRedirect(route('quiz.index'));
+    answer(QuizQuestion::first(), 1)->assertRedirect(route('quiz.index'));
 
     $this->get(route('quiz.index'))
         ->assertSee('正解です')
+        ->assertDontSee('おしいです')
         ->assertSee('かいせつ1');
 });
 
 it('間違えたときもその場で解説が出る', function () {
     makeQuestions();
-    $question = QuizQuestion::first();
 
-    $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => 3]);
+    answer(QuizQuestion::first(), 3);
 
     $this->get(route('quiz.index'))
         ->assertSee('おしいです')
+        ->assertDontSee('正解です')
         ->assertSee('かいせつ1');
 });
 
 it('次へで2問目に進む', function () {
     makeQuestions();
-    $question = QuizQuestion::first();
 
-    $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => 1]);
+    answer(QuizQuestion::first(), 1);
     $this->post(route('quiz.next'))->assertRedirect(route('quiz.index'));
 
     $this->get(route('quiz.index'))
@@ -74,18 +85,18 @@ it('同じ設問に二度答えても最初の回答が残る', function () {
     makeQuestions();
     $question = QuizQuestion::first();
 
-    $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => 3]);
-    $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => 1]);
+    answer($question, 3);
+    answer($question, 1);
 
     // 取り直しが効いていれば「正解です」に変わってしまう
     $this->get(route('quiz.index'))->assertSee('おしいです');
 });
 
-it('全問終えると記録が残り、結果画面へ進む', function () {
+it('全問正解すると満点が記録され、結果画面へ進む', function () {
     makeQuestions();
 
     foreach (QuizQuestion::orderBy('id')->get() as $question) {
-        $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => 1]);
+        answer($question, 1);
         $response = $this->post(route('quiz.next'));
     }
 
@@ -106,7 +117,7 @@ it('間違えた分は得点に入らない', function () {
     makeQuestions();
 
     foreach (QuizQuestion::orderBy('id')->get() as $index => $question) {
-        $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => $index === 0 ? 1 : 0]);
+        answer($question, $index === 0 ? 1 : 0);
         $this->post(route('quiz.next'));
     }
 
@@ -115,9 +126,8 @@ it('間違えた分は得点に入らない', function () {
 
 it('やり直すと1問目に戻る', function () {
     makeQuestions();
-    $question = QuizQuestion::first();
 
-    $this->post(route('quiz.answer'), ['question_id' => $question->id, 'choice' => 1]);
+    answer(QuizQuestion::first(), 1);
     $this->post(route('quiz.next'));
     $this->post(route('quiz.restart'))->assertRedirect(route('quiz.index'));
 

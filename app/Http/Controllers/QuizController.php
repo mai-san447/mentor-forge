@@ -67,7 +67,9 @@ class QuizController extends Controller
 
         // 同じ設問を二度答えても最初の回答を上書きしない（戻る操作での取り直しを防ぐ）
         if (! array_key_exists($validated['question_id'], $answers)) {
-            $answers[$validated['question_id']] = $validated['choice'];
+            // フォームから来る値は文字列。correct_index は整数なので、
+            // ここで整数にしておかないと厳密比較が常に不一致になり、正誤も得点も壊れる。
+            $answers[$validated['question_id']] = (int) $validated['choice'];
             $request->session()->put(self::ANSWERS, $answers);
         }
 
