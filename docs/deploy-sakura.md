@@ -123,8 +123,14 @@ php artisan route:clear
 php artisan view:clear
 php artisan migrate --force
 php artisan config:cache
-php artisan route:cache
 ```
+
+> **`php artisan route:cache` は実行しないこと。**
+> 2026-08-05 に実行したところ、トップページ `/` だけが **HTTP 405（`allow: HEAD`）** を返すようになった。
+> `php artisan route:list` では `GET|HEAD /` が正しく登録されているのに、実リクエストが通らない。
+> `route:clear` で即座に復旧した（他の変更なし）。`/about` `/login` など他のルートは影響を受けない。
+> このアプリは Livewire / Flux のルートマクロを使っており、ルートキャッシュの生成と
+> 相性が悪いと見られる。**`config:cache` は問題なく使える。**
 
 ### 2-7. 検証（ローカルから）
 
@@ -169,6 +175,7 @@ tail -50 ~/www/mentor-forge/storage/logs/laravel.log
 | `Permission denied` / `failed to open stream` | `storage` `bootstrap/cache` の権限 | `chmod -R 755` |
 | `No application encryption key` | `.env` の `APP_KEY` を失った | 退避した `.env` から戻す |
 | 404 になる | 展開階層のミス（二重／バラまき） | `ls -d ~/www/mentor-forge/public` で確認し、2-3 からやり直す |
+| **トップ `/` だけ 405（`allow: HEAD`）** | `route:cache` を実行した | `php artisan route:clear`。このアプリでルートキャッシュは使わない（2-6参照） |
 
 ---
 
