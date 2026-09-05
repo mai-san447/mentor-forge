@@ -67,9 +67,13 @@ class SoloPracticeController extends Controller
 
     private function personaReply(string $message, RoleplaySession $session): string
     {
+        $persona = $session->persona;
+        $scenario = $session->scenario;
+        abort_unless($persona !== null && $scenario !== null, 404);
+
         return app(RoleplayReplyService::class)->reply(
-            $session->persona,
-            $session->scenario->title,
+            $persona,
+            $scenario->title,
             $session->messages()->get(['speaker', 'content'])->toArray(),
         );
     }

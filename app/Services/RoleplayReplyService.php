@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class RoleplayReplyService
 {
+    /** @param array<int, array{speaker: string, content: string}> $history */
     public function reply(Persona $persona, string $scenario, array $history): string
     {
         return match (config('roleplay.provider')) {
@@ -16,6 +17,7 @@ class RoleplayReplyService
         };
     }
 
+    /** @param array<int, array{speaker: string, content: string}> $history */
     private function ollama(Persona $persona, string $scenario, array $history): string
     {
         $transcript = collect($history)->map(fn (array $message) => $message['speaker'].': '.$message['content'])->implode("\n");
@@ -28,9 +30,11 @@ class RoleplayReplyService
         return (string) data_get($response, 'message.content', 'うまく言葉にできないのですが、もう少し話を聞いてもらえますか？');
     }
 
+    /** @param array<int, array{speaker: string, content: string}> $history */
     private function scripted(Persona $persona, array $history): string
     {
-        $message = (string) collect($history)->where('speaker', 'mentor')->last()['content'] ?? '';
+        $lastMessage = collect($history)->where('speaker', 'mentor')->last();
+        $message = is_array($lastMessage) ? (string) ($lastMessage['content'] ?? '') : '';
 
         if (preg_match('/どんな|どう|なぜ|何が|教えて/u', $message)) {
             return 'そうですね…。'.$persona->challenge.'ことが一番気になっています。';

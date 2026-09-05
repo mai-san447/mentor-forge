@@ -16,6 +16,7 @@ class Persona extends Model
         'accent_color',
     ];
 
+    /** @return HasMany<Scenario, $this> */
     public function scenarios(): HasMany
     {
         return $this->hasMany(Scenario::class);

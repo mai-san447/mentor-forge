@@ -24,7 +24,7 @@ class TrioPracticeController extends Controller
             'mentee_name' => ['required', 'string', 'max:50'],
             'observer_name' => ['required', 'string', 'max:50'],
         ]);
-        $scenario = Scenario::findOrFail($validated['scenario_id']);
+        $scenario = Scenario::findOrFail((int) $validated['scenario_id']);
         $session = RoleplaySession::create(array_merge($validated, ['user_id' => $request->user()->id, 'persona_id' => $scenario->persona_id, 'mode' => 'trio', 'room_code' => strtoupper(Str::random(6))]));
 
         return redirect()->route('trio.show', $session);
