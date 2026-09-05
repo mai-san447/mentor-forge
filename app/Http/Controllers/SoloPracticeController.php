@@ -28,6 +28,7 @@ class SoloPracticeController extends Controller
     public function show(RoleplaySession $session): View
     {
         $this->authorizeSession($session);
+
         return view('solo.show', ['session' => $session->load(['persona', 'scenario', 'messages'])]);
     }
 
@@ -37,6 +38,7 @@ class SoloPracticeController extends Controller
         $validated = $request->validate(['message' => ['required', 'string', 'max:1000']]);
         $session->messages()->create(['speaker' => 'mentor', 'content' => $validated['message']]);
         $session->messages()->create(['speaker' => 'persona', 'content' => $this->personaReply($validated['message'], $session)]);
+
         return back();
     }
 
@@ -47,12 +49,14 @@ class SoloPracticeController extends Controller
         $messages = $session->messages()->where('speaker', 'mentor')->pluck('content');
         $score = min(100, 45 + ($messages->count() * 8) + ($messages->filter(fn ($message) => str_contains($message, '？') || str_contains($message, '?'))->count() * 5));
         $session->update(['status' => 'completed', 'score' => $score, 'reflection' => $validated['reflection'] ?? null, 'completed_at' => now()]);
+
         return redirect()->route('solo.result', $session);
     }
 
     public function result(RoleplaySession $session): View
     {
         $this->authorizeSession($session);
+
         return view('solo.result', ['session' => $session->load(['persona', 'scenario', 'messages'])]);
     }
 
@@ -64,9 +68,9 @@ class SoloPracticeController extends Controller
     private function personaReply(string $message, RoleplaySession $session): string
     {
         return app(RoleplayReplyService::class)->reply(
-                $session->persona,
-                $session->scenario->title,
-                $session->messages()->get(['speaker', 'content'])->toArray(),
-            );
+            $session->persona,
+            $session->scenario->title,
+            $session->messages()->get(['speaker', 'content'])->toArray(),
+        );
     }
 }

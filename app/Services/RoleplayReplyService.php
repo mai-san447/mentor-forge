@@ -31,9 +31,19 @@ class RoleplayReplyService
     private function scripted(Persona $persona, array $history): string
     {
         $message = (string) collect($history)->where('speaker', 'mentor')->last()['content'] ?? '';
-        if (preg_match('/どんな|どう|なぜ|何が|教えて/u', $message)) return 'そうですね…。'.$persona->challenge.'ことが一番気になっています。';
-        if (preg_match('/つら|大変|不安|心配|感じ/u', $message)) return 'そう言ってもらえると少しほっとします。実はずっと不安でした。';
-        if (preg_match('/べき|しなさい|すぐに|絶対/u', $message)) return '正しいのかもしれませんが、今の自分にできるか少し不安です。';
+
+        if (preg_match('/どんな|どう|なぜ|何が|教えて/u', $message)) {
+            return 'そうですね…。'.$persona->challenge.'ことが一番気になっています。';
+        }
+
+        if (preg_match('/つら|大変|不安|心配|感じ/u', $message)) {
+            return 'そう言ってもらえると少しほっとします。実はずっと不安でした。';
+        }
+
+        if (preg_match('/べき|しなさい|すぐに|絶対/u', $message)) {
+            return '正しいのかもしれませんが、今の自分にできるか少し不安です。';
+        }
+
         return 'ありがとうございます。まだうまく言葉にできないのですが、もう少し話を聞いてもらえますか？';
     }
 }
