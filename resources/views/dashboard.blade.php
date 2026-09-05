@@ -6,7 +6,10 @@
             <p class="mt-2 max-w-2xl text-zinc-600">メンタリングの知識をクイズで学び、ソロ練習とトリオ練習で身につけましょう。</p>
         </div>
 
-        <div class="grid gap-5 md:grid-cols-3">
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <a href="{{ route('cases.index') }}" class="rounded-2xl bg-cyan-700 p-6 text-white shadow-sm transition hover:-translate-y-1 hover:bg-cyan-800">
+                <span class="text-3xl">💬</span><h2 class="mt-5 text-xl font-bold">ケースドリル</h2><p class="mt-2 text-sm text-cyan-50">自分で答えた後、匿名で返し方を比べます。</p><span class="mt-6 inline-block text-sm font-semibold">ケースを選ぶ →</span>
+            </a>
             <a href="{{ route('solo.index') }}" class="rounded-2xl bg-teal-700 p-6 text-white shadow-sm transition hover:-translate-y-1 hover:bg-teal-800">
                 <span class="text-3xl">🎧</span><h2 class="mt-5 text-xl font-bold">ソロ練習</h2><p class="mt-2 text-sm text-teal-50">AIペルソナと一人で対話を練習します。</p><span class="mt-6 inline-block text-sm font-semibold">練習を始める →</span>
             </a>

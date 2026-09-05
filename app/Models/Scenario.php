@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Scenario extends Model
 {
@@ -12,5 +13,10 @@ class Scenario extends Model
     public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class);
+    }
+
+    public function drillResponses(): HasMany
+    {
+        return $this->hasMany(DrillResponse::class);
     }
 }

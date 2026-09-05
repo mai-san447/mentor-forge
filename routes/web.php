@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CaseDrillController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
@@ -23,6 +24,10 @@ Route::get('contact/inbox', [ContactController::class, 'inbox'])
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('cases', [CaseDrillController::class, 'index'])->name('cases.index');
+    Route::get('cases/{scenario}', [CaseDrillController::class, 'show'])->name('cases.show');
+    Route::post('cases/{scenario}/responses', [CaseDrillController::class, 'store'])->name('cases.responses.store');
 
     Route::get('solo', [SoloPracticeController::class, 'index'])->name('solo.index');
     Route::post('solo/start/{scenario}', [SoloPracticeController::class, 'start'])->name('solo.start');
