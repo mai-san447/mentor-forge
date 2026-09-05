@@ -329,3 +329,7 @@ composer dev       # 開発サーバ起動
 ```
 
 デプロイ手順は [deploy-sakura.md](deploy-sakura.md) を参照。
+
+### 自分で行う本番通しテスト
+
+指定した1アカウントに限り、2週間・4週間を待たず追跡フォームを確認できるパイロットモードを持つ。通常は無効で、外部参加者のテストには使用しない。比較対象がまだない最初の通しテストでは、`pilot:prepare`で合成回答3件を準備し、終了後に`pilot:cleanup`で削除する。手順は [pilot-test-checklist.md](pilot-test-checklist.md) を参照。

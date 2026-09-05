@@ -2,6 +2,7 @@
     <div class="mx-auto max-w-3xl space-y-6">
         <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-teal-700">← マイページへ</a>
         <div><p class="text-sm font-semibold text-indigo-700">{{ $weeks }}週間後の振り返り</p><h1 class="mt-1 text-3xl font-bold">現場で何が起きましたか？</h1><p class="mt-2 text-zinc-600">成果の採点ではなく、試したことと相手との間に起きた変化を残します。</p></div>
+        @if($isPilotTester)<div class="rounded-xl border border-violet-300 bg-violet-50 p-4 text-sm font-semibold text-violet-900">パイロットテスト中のため、記録時期を待たずに入力できます。</div>@endif
         <section class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 sm:p-7"><p class="text-sm font-semibold text-indigo-700">{{ $reflection->scenario->title }}</p><h2 class="mt-2 font-semibold">試すと決めた行動</h2><p class="mt-1 whitespace-pre-wrap leading-7">{{ $reflection->next_action }}</p><p class="mt-4 text-sm text-zinc-600">記録時期：{{ $dueAt->format('Y年n月j日') }}以降</p></section>
 
         @if($followUp)

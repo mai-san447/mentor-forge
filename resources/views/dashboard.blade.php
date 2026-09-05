@@ -1,5 +1,6 @@
 <x-layouts::app :title="__('Mentor Forge')">
     <div class="space-y-8">
+        @if($isPilotTester)<div class="rounded-xl border border-violet-300 bg-violet-50 p-4 text-sm font-semibold text-violet-900">パイロットテストモードです。2週間後・4週間後の記録を今日確認できます。外部テスト前に解除してください。</div>@endif
         @if(session('status'))<div class="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm font-semibold text-teal-900">{{ session('status') }}</div>@endif
         <div>
             <p class="text-sm font-semibold uppercase tracking-[0.2em] text-teal-600">MENTOR FORGE</p>

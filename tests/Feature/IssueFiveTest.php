@@ -97,3 +97,16 @@ it('マイページに2週間後と4週間後の振り返り時期と完了を�
     $this->actingAs($user)->get(route('dashboard'))->assertOk()
         ->assertSee('2週間後')->assertSee('4週間後')->assertSee('記録済み')->assertSee($reflection->created_at->copy()->addWeeks(4)->format('Y/m/d'));
 });
+
+it('指定されたパイロットテスターだけ当日に追跡記録を保存できる', function () {
+    $tester = User::factory()->create(['email' => 'pilot@example.com']);
+    $other = User::factory()->create(['email' => 'other@example.com']);
+    config(['pilot.enabled' => true, 'pilot.tester_email' => $tester->email]);
+    $testerReflection = issueFiveReflection($tester);
+    $otherReflection = issueFiveReflection($other);
+
+    $this->actingAs($tester)->get(route('dashboard'))->assertOk()->assertSee('パイロットテストモード');
+    $this->post(route('follow-ups.store', [$testerReflection, 4]), ['practiced' => '0'])->assertRedirect(route('dashboard'));
+
+    $this->actingAs($other)->post(route('follow-ups.store', [$otherReflection, 2]), ['practiced' => '0'])->assertForbidden();
+});

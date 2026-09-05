@@ -1,6 +1,6 @@
 # さくらレンタルサーバ デプロイ／復旧手順（mentor-forge）
 
-最終更新: 2026-08-05
+最終更新: 2026-09-05
 
 公開URL: https://<host>/mentor-forge/public/
 

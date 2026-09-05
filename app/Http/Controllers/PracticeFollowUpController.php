@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CaseReflection;
 use App\Models\PracticeFollowUp;
+use App\Support\FollowUpSchedule;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class PracticeFollowUpController extends Controller
     public function show(Request $request, CaseReflection $reflection, int $weeks): View
     {
         $this->authorizeRequest($request, $reflection, $weeks);
-        $dueAt = $reflection->created_at->copy()->addWeeks($weeks)->startOfDay();
+        $dueAt = FollowUpSchedule::dueAt($reflection, $request->user(), $weeks);
 
         return view('follow-ups.show', [
             'reflection' => $reflection->load('scenario'),
@@ -23,13 +24,15 @@ class PracticeFollowUpController extends Controller
             'dueAt' => $dueAt,
             'isDue' => now()->startOfDay()->greaterThanOrEqualTo($dueAt),
             'followUp' => $reflection->followUps()->where('weeks_after', $weeks)->first(),
+            'isPilotTester' => FollowUpSchedule::isPilotTester($request->user()),
         ]);
     }
 
     public function store(Request $request, CaseReflection $reflection, int $weeks): RedirectResponse
     {
         $this->authorizeRequest($request, $reflection, $weeks);
-        abort_unless(now()->startOfDay()->greaterThanOrEqualTo($reflection->created_at->copy()->addWeeks($weeks)->startOfDay()), 403);
+        $dueAt = FollowUpSchedule::dueAt($reflection, $request->user(), $weeks);
+        abort_unless(now()->startOfDay()->greaterThanOrEqualTo($dueAt), 403);
 
         $validated = $request->validate([
             'practiced' => ['required', 'boolean'],
