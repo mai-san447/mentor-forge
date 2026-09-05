@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('cases', [CaseDrillController::class, 'index'])->name('cases.index');
     Route::get('cases/{scenario}', [CaseDrillController::class, 'show'])->name('cases.show');
     Route::post('cases/{scenario}/responses', [CaseDrillController::class, 'store'])->name('cases.responses.store');
+    Route::post('cases/{scenario}/reflection', [CaseDrillController::class, 'reflect'])->name('cases.reflection.store');
 
     Route::get('solo', [SoloPracticeController::class, 'index'])->name('solo.index');
     Route::post('solo/start/{scenario}', [SoloPracticeController::class, 'start'])->name('solo.start');

@@ -21,4 +21,10 @@ class Scenario extends Model
     {
         return $this->hasMany(DrillResponse::class);
     }
+
+    /** @return HasMany<CaseReflection, $this> */
+    public function caseReflections(): HasMany
+    {
+        return $this->hasMany(CaseReflection::class);
+    }
 }
