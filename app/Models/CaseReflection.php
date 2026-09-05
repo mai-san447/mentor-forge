@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CaseReflection extends Model
 {
@@ -33,5 +34,11 @@ class CaseReflection extends Model
     public function selectedResponse(): BelongsTo
     {
         return $this->belongsTo(DrillResponse::class, 'selected_response_id');
+    }
+
+    /** @return HasMany<PracticeFollowUp, $this> */
+    public function followUps(): HasMany
+    {
+        return $this->hasMany(PracticeFollowUp::class);
     }
 }
