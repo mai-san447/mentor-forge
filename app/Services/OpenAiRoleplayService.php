@@ -8,6 +8,7 @@ use RuntimeException;
 
 class OpenAiRoleplayService
 {
+    /** @param array<int, array{speaker: string, content: string}> $history */
     public function reply(Persona $persona, string $scenario, array $history): string
     {
         $apiKey = (string) config('services.openai.key');

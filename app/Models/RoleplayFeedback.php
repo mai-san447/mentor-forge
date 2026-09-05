@@ -12,6 +12,7 @@ class RoleplayFeedback extends Model
         'question_score', 'strengths', 'improvements',
     ];
 
+    /** @return BelongsTo<RoleplaySession, $this> */
     public function session(): BelongsTo
     {
         return $this->belongsTo(RoleplaySession::class, 'roleplay_session_id');

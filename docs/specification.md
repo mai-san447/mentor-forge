@@ -1,6 +1,6 @@
 # Mentor Forge 仕様書
 
-最終更新: 2026-08-05
+最終更新: 2026-09-05
 
 ---
 
@@ -24,6 +24,7 @@
 | --- | --- | --- |
 | トップページ | アプリ紹介とログイン／新規登録への導線 | 不要 |
 | ダッシュボード | 練習回数とクイズ最高得点、直近の履歴 | 必要 |
+| ケースドリル | ケースへ自由回答し、回答後に他者回答を匿名で比較 | 必要 |
 | クイズ | 傾聴・質問・共感の4択問題。即時採点と解説 | 必要 |
 | ソロ練習 | AIが演じる相談者と1対1でテキスト対話。終了時にスコアと振り返り | 必要 |
 | トリオ練習 | メンター／メンティ／観察者の3役でルームを作り、相互フィードバックを記録 | 必要 |
@@ -48,6 +49,9 @@ Fortify が `/login` `/register` `/forgot-password` などの認証系ルート�
 | メソッド | パス | ルート名 | 説明 |
 | --- | --- | --- | --- |
 | GET | `/dashboard` | `dashboard` | ダッシュボード |
+| GET | `/cases` | `cases.index` | ケース一覧 |
+| GET | `/cases/{scenario}` | `cases.show` | ケース詳細。回答前は他者回答を取得しない |
+| POST | `/cases/{scenario}/responses` | `cases.responses.store` | 自由回答を1回だけ投稿 |
 | GET | `/solo` | `solo.index` | ペルソナとシナリオの一覧 |
 | POST | `/solo/start/{scenario}` | `solo.start` | セッション開始。相談者の第一声を自動投入 |
 | GET | `/solo/{session}` | `solo.show` | 対話画面 |
@@ -82,6 +86,8 @@ erDiagram
     personas ||--o{ scenarios : "持つ"
     personas ||--o{ roleplay_sessions : "演じられる"
     scenarios ||--o{ roleplay_sessions : "題材になる"
+    scenarios ||--o{ drill_responses : "回答される"
+    users ||--o{ drill_responses : "投稿する"
     roleplay_sessions ||--o{ roleplay_messages : "発言を持つ"
     roleplay_sessions ||--o{ roleplay_feedback : "評価を持つ"
 ```
@@ -127,6 +133,16 @@ erDiagram
 | `roleplay_session_id` | FK | 連鎖削除 |
 | `speaker` | string | `mentor` または `persona` |
 | `content` | text | 発言内容 |
+
+### drill_responses — ケースドリルの自由回答
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `user_id` | FK | 回答者。削除時は連鎖削除 |
+| `scenario_id` | FK | 対象ケース。削除時は連鎖削除 |
+| `content` | text | 自由回答（最大2,000文字） |
+
+`user_id` と `scenario_id` の組み合わせはユニーク。投稿後の編集ルートは設けない。
 
 ### roleplay_feedback — トリオ練習の相互評価
 
@@ -209,6 +225,7 @@ score = round(全フィードバックの (傾聴 + 共感 + 質問) / 3 の平�
 | 対象 | 制御 |
 | --- | --- |
 | ソロ練習の各操作 | セッションの `user_id` が本人 **かつ** `mode=solo` でなければ 403 |
+| ケースドリル | 未回答時は他者回答をDBから取得しない。回答後のみ回答本文を取得し、利用者名・メールアドレスは取得・表示しない |
 | クイズ結果 | `user_id` が本人でなければ 403 |
 | トリオ練習の閲覧・投稿 | `mode=trio` でなければ 404。**所有者チェックは無い** |
 

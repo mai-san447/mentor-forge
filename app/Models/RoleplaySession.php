@@ -18,21 +18,25 @@ class RoleplaySession extends Model
         return ['completed_at' => 'datetime'];
     }
 
+    /** @return BelongsTo<Persona, $this> */
     public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class);
     }
 
+    /** @return BelongsTo<Scenario, $this> */
     public function scenario(): BelongsTo
     {
         return $this->belongsTo(Scenario::class);
     }
 
+    /** @return HasMany<RoleplayMessage, $this> */
     public function messages(): HasMany
     {
         return $this->hasMany(RoleplayMessage::class);
     }
 
+    /** @return HasMany<RoleplayFeedback, $this> */
     public function feedback(): HasMany
     {
         return $this->hasMany(RoleplayFeedback::class);
