@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CaseReflection;
 use App\Models\DrillResponse;
 use App\Models\Scenario;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -29,12 +30,20 @@ class CaseDrillController extends Controller
             ->where('user_id', auth()->id())
             ->first();
 
-        // 他者回答は、自分が回答した後に限って取得する。ビューで隠すだけにしない。
-        $responses = $ownResponse
-            ? $scenario->drillResponses()->oldest()->get(['id', 'content', 'created_at'])
+        // 他者回答は、自分が回答した後に限って取得する。個人情報は取得せず、最大6件をランダム表示する。
+        $otherResponses = $ownResponse
+            ? $scenario->drillResponses()
+                ->where('user_id', '!=', auth()->id())
+                ->inRandomOrder()
+                ->limit(6)
+                ->get(['id', 'content'])
             : collect();
 
-        return view('cases.show', compact('scenario', 'ownResponse', 'responses'));
+        $reflection = $scenario->caseReflections()
+            ->where('user_id', auth()->id())
+            ->first();
+
+        return view('cases.show', compact('scenario', 'ownResponse', 'otherResponses', 'reflection'));
     }
 
     public function store(Request $request, Scenario $scenario): RedirectResponse
@@ -56,5 +65,43 @@ class CaseDrillController extends Controller
 
         return redirect()->route('cases.show', $scenario)
             ->with('status', '回答を投稿しました。ほかの人の回答を匿名で見られます。');
+    }
+
+    public function reflect(Request $request, Scenario $scenario): RedirectResponse
+    {
+        $validated = $request->validate([
+            'selected_response_id' => ['required', 'integer'],
+            'selection_reason' => ['required', 'string', 'max:2000'],
+            'difference' => ['required', 'string', 'max:2000'],
+            'next_action' => ['required', 'string', 'max:1000'],
+        ]);
+
+        $ownResponse = $scenario->drillResponses()
+            ->where('user_id', $request->user()->id)
+            ->first();
+        abort_unless($ownResponse !== null, 403);
+
+        $selectedResponse = $scenario->drillResponses()
+            ->whereKey($validated['selected_response_id'])
+            ->where('user_id', '!=', $request->user()->id)
+            ->firstOrFail();
+
+        try {
+            CaseReflection::create([
+                'user_id' => $request->user()->id,
+                'scenario_id' => $scenario->id,
+                'selected_response_id' => $selectedResponse->id,
+                'selected_response_content' => $selectedResponse->content,
+                'selection_reason' => $validated['selection_reason'],
+                'difference' => $validated['difference'],
+                'next_action' => $validated['next_action'],
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            return redirect()->route('cases.show', $scenario)
+                ->withErrors(['reflection' => 'このケースの振り返りはすでに保存済みです。']);
+        }
+
+        return redirect()->route('cases.show', $scenario)
+            ->with('status', '振り返りと次に試す行動を保存しました。');
     }
 }

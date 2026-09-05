@@ -85,7 +85,7 @@ it('回答後は他者回答を匿名表示し自分の回答を識別する', f
     $this->get(route('cases.show', $this->scenario))
         ->assertOk()
         ->assertSee('相手の気持ちをまず確認します。')
-        ->assertSee('匿名の回答 1')
+        ->assertSee('匿名の回答 A')
         ->assertSee('あなたの回答')
         ->assertSee('沈黙を待ちます。')
         ->assertDontSee('表示してはいけない名前');

@@ -21,10 +21,25 @@
             </a>
         </div>
 
-        <div class="grid gap-5 md:grid-cols-3">
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             <div class="rounded-2xl border border-zinc-200 bg-white p-5"><p class="text-sm text-zinc-500">ソロ完了</p><p class="mt-2 text-3xl font-bold">{{ $soloCount }}<span class="ml-1 text-base font-normal text-zinc-500">回</span></p></div>
             <div class="rounded-2xl border border-zinc-200 bg-white p-5"><p class="text-sm text-zinc-500">トリオ完了</p><p class="mt-2 text-3xl font-bold">{{ $trioCount }}<span class="ml-1 text-base font-normal text-zinc-500">回</span></p></div>
             <div class="rounded-2xl border border-zinc-200 bg-white p-5"><p class="text-sm text-zinc-500">クイズ最高得点</p><p class="mt-2 text-3xl font-bold">{{ $quizBest ?? 0 }}<span class="ml-1 text-base font-normal text-zinc-500">点</span></p></div>
+            <div class="rounded-2xl border border-zinc-200 bg-white p-5"><p class="text-sm text-zinc-500">ケース振り返り</p><p class="mt-2 text-3xl font-bold">{{ $caseReflectionCount }}<span class="ml-1 text-base font-normal text-zinc-500">件</span></p></div>
         </div>
+
+        <section class="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6">
+            <h2 class="text-xl font-bold">ケースドリルの学習履歴</h2>
+            <div class="mt-4 divide-y divide-zinc-100">
+                @forelse($recentCaseReflections as $reflection)
+                    <a href="{{ route('cases.show', $reflection->scenario) }}" class="flex flex-col gap-1 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between">
+                        <div><p class="font-semibold text-zinc-900">{{ $reflection->scenario->title }}</p><p class="mt-1 text-sm text-zinc-600">次に試す：{{ $reflection->next_action }}</p></div>
+                        <span class="text-sm text-teal-700">{{ $reflection->created_at->format('Y/m/d') }} →</span>
+                    </a>
+                @empty
+                    <p class="py-3 text-sm text-zinc-600">まだ振り返りはありません。ケースドリルで最初の1件を記録しましょう。</p>
+                @endforelse
+            </div>
+        </section>
     </div>
 </x-layouts::app>

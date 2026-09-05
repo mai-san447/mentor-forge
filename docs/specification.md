@@ -52,6 +52,7 @@ Fortify が `/login` `/register` `/forgot-password` などの認証系ルート�
 | GET | `/cases` | `cases.index` | ケース一覧 |
 | GET | `/cases/{scenario}` | `cases.show` | ケース詳細。回答前は他者回答を取得しない |
 | POST | `/cases/{scenario}/responses` | `cases.responses.store` | 自由回答を1回だけ投稿 |
+| POST | `/cases/{scenario}/reflection` | `cases.reflection.store` | 匿名回答の選択、差分振り返り、次の行動を保存 |
 | GET | `/solo` | `solo.index` | ペルソナとシナリオの一覧 |
 | POST | `/solo/start/{scenario}` | `solo.start` | セッション開始。相談者の第一声を自動投入 |
 | GET | `/solo/{session}` | `solo.show` | 対話画面 |
@@ -88,6 +89,9 @@ erDiagram
     scenarios ||--o{ roleplay_sessions : "題材になる"
     scenarios ||--o{ drill_responses : "回答される"
     users ||--o{ drill_responses : "投稿する"
+    scenarios ||--o{ case_reflections : "振り返る"
+    users ||--o{ case_reflections : "記録する"
+    drill_responses ||--o{ case_reflections : "選ばれる"
     roleplay_sessions ||--o{ roleplay_messages : "発言を持つ"
     roleplay_sessions ||--o{ roleplay_feedback : "評価を持つ"
 ```
@@ -143,6 +147,20 @@ erDiagram
 | `content` | text | 自由回答（最大2,000文字） |
 
 `user_id` と `scenario_id` の組み合わせはユニーク。投稿後の編集ルートは設けない。
+
+### case_reflections — 回答比較後の振り返り
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `user_id` | FK | 振り返った利用者 |
+| `scenario_id` | FK | 対象ケース |
+| `selected_response_id` | FK（null可） | 選んだ他者回答。元回答削除時はNULL |
+| `selected_response_content` | text | 履歴確認用の匿名回答スナップショット |
+| `selection_reason` | text | 選んだ理由（最大2,000文字） |
+| `difference` | text | 自分の回答との違い（最大2,000文字） |
+| `next_action` | text | 次に試す行動（最大1,000文字） |
+
+1利用者・1ケースにつき1件。自分の回答や別ケースの回答は選択できない。
 
 ### roleplay_feedback — トリオ練習の相互評価
 
@@ -225,7 +243,7 @@ score = round(全フィードバックの (傾聴 + 共感 + 質問) / 3 の平�
 | 対象 | 制御 |
 | --- | --- |
 | ソロ練習の各操作 | セッションの `user_id` が本人 **かつ** `mode=solo` でなければ 403 |
-| ケースドリル | 未回答時は他者回答をDBから取得しない。回答後のみ回答本文を取得し、利用者名・メールアドレスは取得・表示しない |
+| ケースドリル | 未回答時は他者回答をDBから取得しない。回答後は他者の実回答を最大6件、匿名A〜F・ランダム順で表示。利用者名・メールアドレスは取得・表示しない |
 | クイズ結果 | `user_id` が本人でなければ 403 |
 | トリオ練習の閲覧・投稿 | `mode=trio` でなければ 404。**所有者チェックは無い** |
 
