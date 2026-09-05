@@ -53,12 +53,13 @@
 
 - Git差分検査: `git diff --check` 合格
 - PHP静的構文解析: 新規・変更PHPファイルすべて合格
-- Feature Test: テストコード追加済み。ただし作業環境にPHP実行環境がないため未実行
-- Viteビルド: PHPの依存パッケージ `vendor/livewire/flux` が未導入のため停止。今回の変更に起因するコンパイルエラーは確認されていない
+- Feature Test: テストコード追加済み。PRのGitHub Actionsで実行する
+- Viteビルド: ローカルではPHP依存パッケージ未導入のため停止。PRのGitHub Actionsで実行する
+- 既存CI修正: MySQLサービスなしでMySQLへ接続していたため、PHP 8.3とSQLiteメモリDBを使う構成へ修正
 
 ## 6. 次の作業
 
-1. PHP 8.3とComposer依存がそろった環境で `composer test` を実行する。
-2. マイグレーションを適用し、PC・スマートフォンで手動確認する。
+1. GitHub Actionsで `composer ci:check` の合格を確認する。
+2. 本番反映時にマイグレーションを適用し、PC・スマートフォンで手動確認する。
 3. テスト合格後、Issue #3のチェック項目を更新してcloseする。
 4. 次のIssueで、回答選択・差分振り返り・次の行動登録へ進む。
