@@ -53,13 +53,14 @@
 
 - Git差分検査: `git diff --check` 合格
 - PHP静的構文解析: 新規・変更PHPファイルすべて合格
-- Feature Test: テストコード追加済み。PRのGitHub Actionsで実行する
-- Viteビルド: ローカルではPHP依存パッケージ未導入のため停止。PRのGitHub Actionsで実行する
+- Feature Test: GitHub Actionsで全テスト合格
+- Viteビルド: GitHub Actionsで成功
+- Pint: 合格
+- PHPStan: 合格
 - 既存CI修正: MySQLサービスなしでMySQLへ接続していたため、PHP 8.3とSQLiteメモリDBを使う構成へ修正
 
 ## 6. 次の作業
 
-1. GitHub Actionsで `composer ci:check` の合格を確認する。
+1. PRをマージし、Issue #3をcloseする。
 2. 本番反映時にマイグレーションを適用し、PC・スマートフォンで手動確認する。
-3. テスト合格後、Issue #3のチェック項目を更新してcloseする。
-4. 次のIssueで、回答選択・差分振り返り・次の行動登録へ進む。
+3. 次のIssueで、回答選択・差分振り返り・次の行動登録へ進む。
