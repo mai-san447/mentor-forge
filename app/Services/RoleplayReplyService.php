@@ -34,7 +34,7 @@ class RoleplayReplyService
     private function scripted(Persona $persona, array $history): string
     {
         $lastMessage = collect($history)->where('speaker', 'mentor')->last();
-        $message = is_array($lastMessage) ? (string) ($lastMessage['content'] ?? '') : '';
+        $message = is_array($lastMessage) ? $lastMessage['content'] : '';
 
         if (preg_match('/どんな|どう|なぜ|何が|教えて/u', $message)) {
             return 'そうですね…。'.$persona->challenge.'ことが一番気になっています。';

@@ -28,7 +28,7 @@ class ContactController extends Controller
         // 2層目: 送信が速すぎるものを弾く。
         // セッションが無い場合（Cookieを拒否している等）は正規の利用者を締め出さないよう通す。
         $openedAt = $request->session()->pull('contact_opened_at');
-        if ($openedAt !== null && now()->timestamp - (int) $openedAt < (int) config('contact.min_seconds')) {
+        if ($openedAt !== null && (int) now()->timestamp - (int) $openedAt < (int) config('contact.min_seconds')) {
             return back()
                 ->withInput()
                 ->withErrors(['body' => '送信が早すぎます。少し時間をおいてもう一度お試しください。']);
