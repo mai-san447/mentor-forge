@@ -3,6 +3,8 @@
 use App\Http\Controllers\CaseDrillController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiagnosisController;
+use App\Http\Controllers\PracticeFollowUpController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\SoloPracticeController;
 use App\Http\Controllers\TrioPracticeController;
@@ -24,6 +26,10 @@ Route::get('contact/inbox', [ContactController::class, 'inbox'])
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('diagnosis', [DiagnosisController::class, 'show'])->name('diagnosis.show');
+    Route::post('diagnosis', [DiagnosisController::class, 'store'])->name('diagnosis.store');
+    Route::get('reflections/{reflection}/follow-ups/{weeks}', [PracticeFollowUpController::class, 'show'])->name('follow-ups.show');
+    Route::post('reflections/{reflection}/follow-ups/{weeks}', [PracticeFollowUpController::class, 'store'])->name('follow-ups.store');
 
     Route::get('cases', [CaseDrillController::class, 'index'])->name('cases.index');
     Route::get('cases/{scenario}', [CaseDrillController::class, 'show'])->name('cases.show');

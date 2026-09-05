@@ -1,10 +1,19 @@
 <x-layouts::app :title="__('Mentor Forge')">
     <div class="space-y-8">
+        @if(session('status'))<div class="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm font-semibold text-teal-900">{{ session('status') }}</div>@endif
         <div>
             <p class="text-sm font-semibold uppercase tracking-[0.2em] text-teal-600">MENTOR FORGE</p>
             <h1 class="mt-2 text-3xl font-bold tracking-tight">学んで、試して、実践する</h1>
             <p class="mt-2 max-w-2xl text-zinc-600">メンタリングの知識をクイズで学び、ソロ練習とトリオ練習で身につけましょう。</p>
         </div>
+
+        <section class="rounded-2xl border border-teal-200 bg-teal-50 p-5 sm:p-6">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 class="text-xl font-bold">対話の変化を振り返る</h2><p class="mt-1 text-sm text-zinc-600">{{ !$preDiagnosis ? 'まず利用前の感覚を記録します。' : (!$postDiagnosis ? 'ケース学習後に再診断すると、項目ごとの変化が見えます。' : '利用前後の変化を項目別に確認できます。') }}</p></div><a href="{{ route('diagnosis.show') }}" class="shrink-0 rounded-xl bg-teal-700 px-5 py-3 text-center font-semibold text-white">{{ !$preDiagnosis ? '利用前診断を始める' : (!$postDiagnosis ? '再診断へ' : '変化を見る') }}</a></div>
+        </section>
+
+        @if($followUpSchedule->isNotEmpty())
+            <section class="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6"><h2 class="text-xl font-bold">これからの振り返り</h2><p class="mt-1 text-sm text-zinc-600">ケースで決めた行動を、2週間後・4週間後に現場の出来事と結びつけて記録します。</p><div class="mt-4 divide-y divide-zinc-100">@foreach($followUpSchedule as $item)<a href="{{ route('follow-ups.show', [$item['reflection'], $item['weeks']]) }}" class="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"><div><p class="font-semibold">{{ $item['reflection']->scenario->title }}・{{ $item['weeks'] }}週間後</p><p class="mt-1 line-clamp-1 text-sm text-zinc-600">試す行動：{{ $item['reflection']->next_action }}</p></div><span class="shrink-0 rounded-full px-3 py-1 text-sm font-semibold {{ $item['completed'] ? 'bg-teal-100 text-teal-800' : ($item['due_at']->isPast() ? 'bg-amber-100 text-amber-900' : 'bg-zinc-100 text-zinc-700') }}">{{ $item['completed'] ? '記録済み' : ($item['due_at']->isPast() ? '記録できます' : $item['due_at']->format('Y/m/d').'から') }}</span></a>@endforeach</div></section>
+        @endif
 
         <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             <a href="{{ route('cases.index') }}" class="rounded-2xl bg-cyan-700 p-6 text-white shadow-sm transition hover:-translate-y-1 hover:bg-cyan-800">

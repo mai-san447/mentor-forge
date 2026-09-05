@@ -25,6 +25,8 @@
 | トップページ | アプリ紹介とログイン／新規登録への導線 | 不要 |
 | ダッシュボード | 練習回数とクイズ最高得点、直近の履歴 | 必要 |
 | ケースドリル | ケースへ自由回答し、回答後に他者回答を匿名で比較 | 必要 |
+| 対話の振り返り診断 | 利用前後の自己認識を6項目で記録し、項目別の変化を表示 | 必要 |
+| 実践フォローアップ | ケースの次の行動について2週間後・4週間後の実践を記録 | 必要 |
 | クイズ | 傾聴・質問・共感の4択問題。即時採点と解説 | 必要 |
 | ソロ練習 | AIが演じる相談者と1対1でテキスト対話。終了時にスコアと振り返り | 必要 |
 | トリオ練習 | メンター／メンティ／観察者の3役でルームを作り、相互フィードバックを記録 | 必要 |
@@ -53,6 +55,8 @@ Fortify が `/login` `/register` `/forgot-password` などの認証系ルート�
 | GET | `/cases/{scenario}` | `cases.show` | ケース詳細。回答前は他者回答を取得しない |
 | POST | `/cases/{scenario}/responses` | `cases.responses.store` | 自由回答を1回だけ投稿 |
 | POST | `/cases/{scenario}/reflection` | `cases.reflection.store` | 匿名回答の選択、差分振り返り、次の行動を保存 |
+| GET/POST | `/diagnosis` | `diagnosis.show/store` | 利用前・利用後の自己認識を記録し、変化を表示 |
+| GET/POST | `/reflections/{reflection}/follow-ups/{weeks}` | `follow-ups.show/store` | 2週間後・4週間後の実践記録 |
 | GET | `/solo` | `solo.index` | ペルソナとシナリオの一覧 |
 | POST | `/solo/start/{scenario}` | `solo.start` | セッション開始。相談者の第一声を自動投入 |
 | GET | `/solo/{session}` | `solo.show` | 対話画面 |
@@ -170,6 +174,29 @@ erDiagram
 | `reviewer_role` | string | `observer` / `mentee` / `self` |
 | `listening_score` `empathy_score` `question_score` | tinyint | 各1〜5 |
 | `strengths` `improvements` | text | 良かった点／改善点 |
+
+### diagnostic_assessments — 利用前後の対話の振り返り
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `user_id` | FK | 記録した利用者 |
+| `phase` | string | `pre`（利用前）または`post`（利用後） |
+| `responses` | JSON | 対話行動6項目への1〜5の自己認識。合計点は算出しない |
+
+利用後の記録は、利用前の記録後にケース振り返りを1件以上保存すると入力できる。比較画面は各項目の選択肢と変化だけを示し、総合点・順位・能力判定は表示しない。
+
+### practice_follow_ups — 現場実践の追跡
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `user_id` / `case_reflection_id` | FK | 利用者と起点となるケース振り返り |
+| `weeks_after` | tinyint | `2`または`4` |
+| `practiced` | boolean | 次の行動を実践したか |
+| `counterpart_reaction` | text | 相手の反応 |
+| `consultation_change` | string | 深まった／変化なし／浅くなった／不明 |
+| `note` | text | 次に向けた任意メモ |
+
+ケース振り返りの作成日から2週間後・4週間後を記録可能日とし、それ以前の保存は拒否する。本人以外は閲覧・保存できない。
 
 ### quiz_questions / quiz_attempts
 
