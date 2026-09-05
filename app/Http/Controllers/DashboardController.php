@@ -6,6 +6,8 @@ use App\Models\CaseReflection;
 use App\Models\DiagnosticAssessment;
 use App\Models\QuizAttempt;
 use App\Models\RoleplaySession;
+use App\Models\User;
+use App\Support\FollowUpSchedule;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -13,13 +15,15 @@ class DashboardController extends Controller
     public function __invoke(): View
     {
         $userId = auth()->id();
+        /** @var User $user */
+        $user = auth()->user();
         $diagnostics = DiagnosticAssessment::where('user_id', $userId)->get()->keyBy('phase');
         $followUpSchedule = CaseReflection::with(['scenario', 'followUps'])
             ->where('user_id', $userId)->latest()->get()
             ->flatMap(fn (CaseReflection $reflection) => collect([2, 4])->map(fn (int $weeks) => [
                 'reflection' => $reflection,
                 'weeks' => $weeks,
-                'due_at' => $reflection->created_at->copy()->addWeeks($weeks)->startOfDay(),
+                'due_at' => FollowUpSchedule::dueAt($reflection, $user, $weeks),
                 'completed' => $reflection->followUps->contains('weeks_after', $weeks),
             ]))->sortBy('due_at')->values();
 
@@ -37,6 +41,7 @@ class DashboardController extends Controller
             'preDiagnosis' => $diagnostics->get('pre'),
             'postDiagnosis' => $diagnostics->get('post'),
             'followUpSchedule' => $followUpSchedule,
+            'isPilotTester' => FollowUpSchedule::isPilotTester($user),
         ]);
     }
 }
