@@ -4,11 +4,11 @@ namespace App\Support;
 
 use App\Models\CaseReflection;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
 class FollowUpSchedule
 {
-    public static function dueAt(CaseReflection $reflection, User $user, int $weeks): Carbon
+    public static function dueAt(CaseReflection $reflection, User $user, int $weeks): CarbonInterface
     {
         if (self::isPilotTester($user)) {
             return $reflection->created_at->copy()->startOfDay();
