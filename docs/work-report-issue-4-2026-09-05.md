@@ -40,4 +40,9 @@ Issue #3で実装した「自分で回答してから他者回答を見る」に
 
 ## 4. 検証
 
-PRのGitHub ActionsでVite、Pint、PHPStan、Feature・Unit Testを実行する。
+GitHub Actionsで次の検証にすべて合格した。
+
+- Vite build
+- Pint
+- PHPStan
+- Feature・Unit Test（Issue #4の新規8件を含む）
