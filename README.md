@@ -54,6 +54,11 @@ G's Academyの卒業制作として開発しています。
 - Tailwind CSS
 - GitHub Actions
 
+## 開発を始める
+
+ローカル環境、ブランチ運用、AIレビューの手順は
+[開発環境セットアップ](docs/development-environment.md)を参照してください。
+
 ## セキュリティ
 
 - 秘密情報は環境変数で管理し、リポジトリへ登録しません
