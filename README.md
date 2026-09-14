@@ -1,5 +1,12 @@
 # Mentor Forge
 
+## 新版との区別（2026年9月15日追記）
+
+このリポジトリはLaravel / MySQL / さくらの初期実証版です。Next.js / Vercelの会話練習版は別リポジトリ [mentor-forge-next](https://github.com/mai-san447/mentor-forge-next) で開発・公開しています。以下の進捗は初期版の記録です。
+
+MVPではデータを移行・同期しません。旧版をVercelで誤ってビルドしないよう、このリポジトリの `vercel.json` はGit自動デプロイを停止します。さくらの公開環境、データ、GitHub Actionsの検査はそのまま維持します。
+
+
 メンタリング（1on1）のスキルを、知識だけで終わらせず、ケースへの回答・他者との比較・現場実践の振り返りまで一続きで練習するWebアプリケーションです。
 
 G's Academyの卒業制作として開発しています。
